@@ -1,6 +1,6 @@
 {
   "stackName": "StaticSite-Preview-000",
-  "subdomain": "preview.blog",
+  "subdomain": "preview.site",
   "customHeadersBehavior": {
     "customHeaders": [
       {
