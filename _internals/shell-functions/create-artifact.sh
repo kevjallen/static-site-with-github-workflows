@@ -20,7 +20,7 @@ function create-artifact {
 
   local dest
   dest=$(realpath -m "${1:-$ARTIFACT_PATH}")
-  mkdir -p $(dirname "${dest}"})
+  mkdir -p $(dirname "${dest}")
 
   cd "${site}" && zip -r "${dest}" .
 }

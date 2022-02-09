@@ -19,7 +19,7 @@ function download-release {
   local file_name=$(basename "${ARTIFACT_PATH}")
 
   curl "${repo_url}/releases/download/${release}/${file_name}" \
-    -L --create-dirs -o "${ARTIFACT_PATH}"
+    -L -o "${ARTIFACT_PATH}" --create-dirs
 }
 
 download-release "$@"
