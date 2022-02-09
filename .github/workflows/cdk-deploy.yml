@@ -10,7 +10,7 @@ on:
       environment:
         required: true
         type: string
-     version:
+      version:
         required: true
         type: string 
       context:
