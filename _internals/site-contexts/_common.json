@@ -1,0 +1,26 @@
+{
+  "domainName": "kevjallen.com",
+  "securityHeadersBehavior": {
+    "contentTypeOptions": {
+      "override": false
+    },
+    "frameOptions": {
+      "frameOption": "DENY",
+      "override": false
+    },
+    "referrerPolicy": {
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "override": false
+    },
+    "strictTransportSecurity": {
+      "accessControlMaxAge": 600,
+      "includeSubdomains": true,
+      "override": false
+    },
+    "xssProtection": {
+      "modeBlock": true,
+      "override": false,
+      "protection": true
+    }
+  }
+}

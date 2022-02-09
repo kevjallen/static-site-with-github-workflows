@@ -1,0 +1,86 @@
+name: CDK Deploy
+
+on:
+  workflow_call:
+
+    inputs:
+      awsRegion:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      artifactName:
+        required: true
+        type: string
+      artifactRun:
+        required: false
+        type: string
+      context:
+        default: '{}'
+        required: false
+        type: string
+
+    secrets:
+      awsAccountId:
+        required: true
+      awsAccessKeyId:
+        required: true
+      awsSecretAccessKey:
+        required: true
+      githubToken:
+        required: true
+
+jobs:
+  deploy:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup asdf
+      uses: asdf-vm/actions/setup@v1
+
+    - name: Install nodejs
+      run: |
+        asdf plugin add nodejs && asdf install nodejs
+
+    - name: Install jq
+      run: |
+        asdf plugin add jq && asdf install jq
+
+    - name: Download artifact (from current run)
+      if: ${{ inputs.artifactRun == '' }}
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ inputs.artifactName }}
+        path: _artifact
+
+    - name: Download artifact (from previous run)
+      if: ${{ inputs.artifactRun != '' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.githubToken }}
+      run: |
+        _internals/shell-functions/download-artifact.sh \
+          '${{ github.repository }}' \
+          '${{ inputs.artifactRun }}' \
+          '${{ inputs.artifactName }}' \
+          '_artifact'
+
+    - name: Read CDK context
+      id: cdk_context
+      run: |
+        CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
+          ${{ inputs.context }})"
+        echo "::set-output name=cdk_context_args::"$CDK_CONTEXT_ARGS""
+
+    - name: CDK deploy
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
+      run: |
+        _internals/shell-functions/cdk-deploy-to.sh \
+          '${{ secrets.awsAccountId }}' '${{ inputs.awsRegion }}' \
+          ${{ steps.cdk_context.outputs.cdk_context_args }}

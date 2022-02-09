@@ -1,0 +1,11 @@
+title: Kevin Allen
+email: kevjallen16@gmail.com
+description: >- 
+  Engineer and consultant from Cleveland, Ohio
+url: www.kevjallen.com
+twitter_username: kevjallen
+github_username: kevjallen
+
+theme: minima
+plugins:
+  - jekyll-feed
