@@ -6,21 +6,34 @@ on:
     
   workflow_dispatch:
     inputs:
-      environment:
-        default: All
-        options:
-        - All
-        - Preview
-        - Production
-        required: true
-        type: choice
       version:
         required: false
         type: string
 
 jobs:
+  setup:
+    if: |
+      github.event.inputs.version == ''
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version_lookup.outputs.version }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Lookup current version
+      id: version_lookup
+      run: |
+        VERSION=$(git tag --points-at)
+        echo "::set-output name=version::$VERSION"
+
   build:
-    if: ${{ github.event.inputs.version == '' }}
+    needs: [setup]
+    if: |
+      !failure() &&
+      github.event.inputs.version == ''
+      needs.setup.outputs.version == ''
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }}
@@ -49,22 +62,28 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         npx semantic-release
-        VERSION=$(git tag --points-at) || return 0
+        VERSION=$(git tag --points-at)
         echo "::set-output name=version::$VERSION"
 
   preview:
-    needs: [build]
-    if: |
-      !failure() && (github.event.inputs.environment || needs.build.outputs.version) &&
-      github.event.inputs.environment == '' ||
-      github.event.inputs.environment == 'All' ||
-      github.event.inputs.environment == 'Preview'
+    needs: [setup, build]
+    if: >-
+      !failure() && (
+        github.event.inputs.version || 
+        needs.setup.outputs.version ||
+        needs.build.outputs.version
+      )
     uses: ./.github/workflows/cdk-deploy.yml
     with:
-      version: ${{ github.event.inputs.environment || needs.build.outputs.version }}
+      version: >-
+        ${{
+          github.event.inputs.version || 
+          needs.setup.outputs.version ||
+          needs.build.outputs.version
+        }}
       awsRegion: us-east-2
       environment: Preview
-      context: >
+      context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-preview.json
     secrets:
@@ -73,18 +92,24 @@ jobs:
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   production:
-    needs: [build, preview]
-    if: |
-      !failure() && (github.event.inputs.environment || needs.build.outputs.version) &&
-      github.event.inputs.environment == '' ||
-      github.event.inputs.environment == 'All' ||
-      github.event.inputs.environment == 'Production'
+    needs: [setup, build, preview]
+    if: >-
+      !failure() && (
+        github.event.inputs.version || 
+        needs.setup.outputs.version ||
+        needs.build.outputs.version
+      )
     uses: ./.github/workflows/cdk-deploy.yml
     with:
-      version: ${{ github.event.inputs.environment || needs.build.outputs.version }}
+      version: >-
+        ${{
+          github.event.inputs.version || 
+          needs.setup.outputs.version ||
+          needs.build.outputs.version
+        }}
       awsRegion: us-east-2
       environment: Production
-      context: >
+      context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-production.json
     secrets:
