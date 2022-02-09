@@ -33,7 +33,7 @@ jobs:
     needs: [setup]
     if: >-
       !failure() &&
-      !github.event.inputs.version &&
+      !github.events.inputs.version &&
       !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
