@@ -7,7 +7,7 @@
     "@semantic-release/release-notes-generator",
     ["@semantic-release/exec", {
       "prepareCmd": "./_internals/shell-functions/create-artifact.sh",
-      "successCommand": "export VERSION=${lastRelease.version}"
+      "successCommand": "echo ${lastRelease.version}"
     }],
     ["@semantic-release/npm", {
       "npmPublish": false,

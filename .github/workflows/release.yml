@@ -32,12 +32,19 @@ jobs:
     - name: Setup ruby
       uses: ruby/setup-ruby@v1
 
+    - name: Setup asdf
+      uses: asdf-vm/actions/setup@v1
+
+    - name: Install nodejs
+      run: |
+        asdf plugin add nodejs && asdf install nodejs
+
     - name: Create release
       id: release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        npx semantic-release
+        VERSION=$(npx semantic-release) || exit 1
         echo "::set-output name=version::$VERSION"
 
   preview:
