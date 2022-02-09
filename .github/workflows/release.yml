@@ -40,6 +40,10 @@ jobs:
       version: ${{ steps.release.outputs.version }}
 
     steps:
+    - run: |
+        echo '${{ github.events.inputs.version }}'
+        echo '${{ needs.setup.outputs.version }}'
+
     - name: Checkout
       uses: actions/checkout@v2
 
