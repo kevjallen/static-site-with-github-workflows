@@ -49,7 +49,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         npx semantic-release
-        VERSION=$(git describe --tags) || return 0
+        VERSION=$(git tag --points-at) || return 0
         echo "::set-output name=version::$VERSION"
 
   preview:
