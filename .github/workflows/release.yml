@@ -12,8 +12,8 @@ on:
 
 jobs:
   setup:
-    if: |
-      github.event.inputs.version == ''
+    if: >-
+      !github.event.inputs.version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version_lookup.outputs.version }}
@@ -30,10 +30,10 @@ jobs:
 
   build:
     needs: [setup]
-    if: |
+    if: >-
       !failure() &&
-      github.event.inputs.version == ''
-      needs.setup.outputs.version == ''
+      !github.event.inputs.version &&
+      !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }}
