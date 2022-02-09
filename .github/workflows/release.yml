@@ -34,7 +34,7 @@ jobs:
     if: >-
       !failure() &&
       !github.event.inputs.version &&
-      !needs.setup.outputs.version'
+      !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }}
