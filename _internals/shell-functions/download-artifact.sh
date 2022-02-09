@@ -48,7 +48,7 @@ function download-artifact {
     jq -r --arg NAME "${src_artifact}" '.artifacts | select(.[].name == $NAME)')
 
   local latest_artifact_with_name
-  latest_artifact_with_name=$(echo ${artifacts_with_name} | \
+  latest_artifact_with_name=$(echo "${artifacts_with_name}" | \
     jq -r '. |= sort_by(.created_at) | last')
 
   if [[ -z "${latest_artifact_with_name}" ]]; then
@@ -57,16 +57,16 @@ function download-artifact {
   fi
 
   local artifact_download_url
-  artifact_download_url=$(echo ${latest_artifact_with_name} | \
+  artifact_download_url=$(echo "${latest_artifact_with_name}" | \
     jq -r '.archive_download_url')
 
   local zipped_artifact
   zipped_artifact=$(mktemp -d)/artifact.zip
 
-  curl -L -H "Authorization: token $GITHUB_TOKEN" -o ${zipped_artifact} \
+  curl -L -H "Authorization: token $GITHUB_TOKEN" -o "${zipped_artifact}" \
     "${artifact_download_url}"
   
-  if [[ "$(file -b --mime-type ${zipped_artifact})" != "application/zip" ]]; then
+  if [[ "$(file -b --mime-type "${zipped_artifact}")" != "application/zip" ]]; then
     echo "could not download artifact from '${artifact_download_url}'"
     echo "ensure your token is valid and has required scope"
     return 1
