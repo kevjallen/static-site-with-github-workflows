@@ -17,7 +17,6 @@ on:
         required: false
         type: string
       context:
-        default: '{}'
         required: false
         type: string
 
@@ -71,6 +70,7 @@ jobs:
 
     - name: Read CDK context
       id: cdk_context
+      if: ${{ inputs.context != '' }}
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
           ${{ inputs.context }})"
