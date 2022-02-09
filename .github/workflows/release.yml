@@ -43,27 +43,8 @@ jobs:
         name: site
         path: _artifact/site.zip
 
-  dummy:
-    needs: [build]
-    if: |
-      !failure() &&
-      github.event.inputs.environment == '' ||
-      github.event.inputs.environment == 'All' ||
-      github.event.inputs.environment == 'Dummy'
-    uses: ./.github/workflows/cdk-deploy.yml
-    with:
-      artifactName: ${{ github.event.inputs.artifactName || 'site' }}
-      artifactRun: ${{ github.event.inputs.artifactRun }}
-      awsRegion: us-east-2
-      environment: Dummy
-    secrets:
-      awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
-      awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      githubToken: ${{ secrets.GITHUB_TOKEN }}
-
   preview:
-    needs: [build, dummy]
+    needs: [build]
     if: |
       !failure() &&
       github.event.inputs.environment == '' ||
@@ -85,7 +66,7 @@ jobs:
       githubToken: ${{ secrets.GITHUB_TOKEN }}
 
   production:
-    needs: [build, dummy, preview]
+    needs: [build, preview]
     if: |
       !failure() &&
       github.event.inputs.environment == '' ||
