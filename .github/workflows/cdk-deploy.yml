@@ -49,9 +49,8 @@ jobs:
       env:
         GITHUB_REPO_URL: https://github.com/${{ github.repository }}
       run: |
-        mkdir -p _archive
-        curl -L "$GITHUB_REPO_URL/releases/download/${{ inputs.version }}/site.zip" \
-          -o "_archive/site.zip"
+        curl "$GITHUB_REPO_URL/releases/download/${{ inputs.version }}/site.zip" \
+          -o "_artifact/site.zip" -L --create-dirs
 
     - name: Read CDK context
       id: cdk_context
