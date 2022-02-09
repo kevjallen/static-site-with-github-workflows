@@ -50,7 +50,7 @@ jobs:
         GITHUB_REPO_URL: https://github.com/${{ github.repository }}
       run: |
         mkdir -p _archive
-        curl "$GITHUB_REPO_URL/archive/refs/tags/${{ inputs.version }}.tgz" \
+        curl -L "$GITHUB_REPO_URL/releases/download/${{ inputs.version }}/site.zip" \
           -o "_archive/site.zip"
 
     - name: Read CDK context
