@@ -8,6 +8,6 @@ if [[ -z "$AWS_STACK_PATH" ]]; then
   AWS_STACK_PATH='_internals/aws-stack'
 fi
 
-if [[ -z "$GITHUB_API_ENDPOINT" ]]; then
-  GITHUB_API_ENDPOINT="https://api.github.com"
+if [[ -z "${GITHUB_SERVER_URL}" ]]; then
+  GITHUB_SERVER_URL='https://github.com'
 fi
