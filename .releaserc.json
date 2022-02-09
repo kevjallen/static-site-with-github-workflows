@@ -1,0 +1,22 @@
+{
+  "release": {
+    "branches": ["master"]
+  },
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/exec", {
+      "prepareCmd": "./_internals/shell-functions/create-artifact.sh",
+      "successCommand": "export VERSION=${lastRelease.version}"
+    }],
+    ["@semantic-release/npm", {
+      "npmPublish": false,
+      "tarballDir": "_site"
+    }],
+    ["@semantic-release/github", {
+      "assets": [
+        { "path": "_site/*.tgz", "label": "Site contents" }
+      ]
+    }]
+  ]
+}

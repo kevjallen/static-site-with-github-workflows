@@ -10,12 +10,9 @@ on:
       environment:
         required: true
         type: string
-      artifactName:
+     version:
         required: true
-        type: string
-      artifactRun:
-        required: false
-        type: string
+        type: string 
       context:
         required: false
         type: string
@@ -26,8 +23,6 @@ on:
       awsAccessKeyId:
         required: true
       awsSecretAccessKey:
-        required: true
-      githubToken:
         required: true
 
 jobs:
@@ -50,23 +45,13 @@ jobs:
       run: |
         asdf plugin add jq && asdf install jq
 
-    - name: Download artifact (from current run)
-      if: ${{ inputs.artifactRun == '' }}
-      uses: actions/download-artifact@v2
-      with:
-        name: ${{ inputs.artifactName }}
-        path: _artifact
-
-    - name: Download artifact (from previous run)
-      if: ${{ inputs.artifactRun != '' }}
+    - name: Download artifact
       env:
-        GITHUB_TOKEN: ${{ secrets.githubToken }}
+        GITHUB_REPO_URL: https://github.com/${{ github.repository }}
       run: |
-        _internals/shell-functions/download-artifact.sh \
-          '${{ github.repository }}' \
-          '${{ inputs.artifactRun }}' \
-          '${{ inputs.artifactName }}' \
-          '_artifact'
+        mkdir -p _archive
+        curl "$GITHUB_REPO_URL/archive/refs/tags/${{ inputs.version }}.tgz" \
+          -o "_archive/site.zip"
 
     - name: Read CDK context
       id: cdk_context
