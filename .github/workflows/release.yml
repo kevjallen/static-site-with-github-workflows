@@ -39,19 +39,23 @@ jobs:
       run: |
         asdf plugin add nodejs && asdf install nodejs
 
-    - name: Create release
+    - name: Create artifact
+      run: |
+        _internals/shell-functions/create-artifact.sh
+
+    - name: Publish release
       id: release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        npm install -g @semantic-release/exec
-        VERSION=$(npx semantic-release) || exit 1
+        npx semantic-release
+        VERSION=$(git describe --tags) || return 0
         echo "::set-output name=version::$VERSION"
 
   preview:
     needs: [build]
     if: |
-      !failure() &&
+      !failure() && (github.event.inputs.environment || needs.build.outputs.version) &&
       github.event.inputs.environment == '' ||
       github.event.inputs.environment == 'All' ||
       github.event.inputs.environment == 'Preview'
@@ -71,7 +75,7 @@ jobs:
   production:
     needs: [build, preview]
     if: |
-      !failure() &&
+      !failure() && (github.event.inputs.environment || needs.build.outputs.version) &&
       github.event.inputs.environment == '' ||
       github.event.inputs.environment == 'All' ||
       github.event.inputs.environment == 'Production'
