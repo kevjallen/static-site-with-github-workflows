@@ -27,13 +27,14 @@ jobs:
       run: |
         VERSION=$(git tag --points-at)
         echo "::set-output name=version::$VERSION"
+        echo "$VERSION"
 
   build:
     needs: [setup]
     if: >-
       !failure() &&
-      github.event.inputs.version == '' &&
-      needs.setup.outputs.version == ''
+      !github.event.inputs.version &&
+      !needs.setup.outputs.version'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }}
