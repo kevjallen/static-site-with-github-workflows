@@ -33,7 +33,7 @@ jobs:
     needs: [setup]
     if: >-
       !failure() &&
-      !github.events.inputs.version &&
+      !github.event.inputs.version &&
       !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
@@ -41,7 +41,7 @@ jobs:
 
     steps:
     - run: |
-        echo '${{ github.events.inputs.version }}'
+        echo '${{ github.event.inputs.version }}'
         echo '${{ needs.setup.outputs.version }}'
 
     - name: Checkout
@@ -67,7 +67,7 @@ jobs:
     needs: [setup, build]
     if: >-
       !failure() && (
-        github.event.inputs.version || 
+        github.event.inputs.version ||
         needs.setup.outputs.version ||
         needs.build.outputs.version
       )
@@ -75,7 +75,7 @@ jobs:
     with:
       version: >-
         ${{
-          github.event.inputs.version || 
+          github.event.inputs.version ||
           needs.setup.outputs.version ||
           needs.build.outputs.version
         }}
@@ -93,7 +93,7 @@ jobs:
     needs: [setup, build, preview]
     if: >-
       !failure() && (
-        github.event.inputs.version || 
+        github.event.inputs.version ||
         needs.setup.outputs.version ||
         needs.build.outputs.version
       )
@@ -101,7 +101,7 @@ jobs:
     with:
       version: >-
         ${{
-          github.event.inputs.version || 
+          github.event.inputs.version ||
           needs.setup.outputs.version ||
           needs.build.outputs.version
         }}
