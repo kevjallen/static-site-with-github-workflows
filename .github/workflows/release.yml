@@ -22,6 +22,8 @@ jobs:
   build:
     if: ${{ github.event.inputs.version == '' }}
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
 
     steps:
     - name: Checkout
@@ -47,7 +49,7 @@ jobs:
       github.event.inputs.environment == 'Preview'
     uses: ./.github/workflows/cdk-deploy.yml
     with:
-      version: ${{ github.event.inputs.environment || steps.release.outputs.version }}
+      version: ${{ github.event.inputs.environment || needs.build.outputs.version }}
       awsRegion: us-east-2
       environment: Preview
       context: >
@@ -67,7 +69,7 @@ jobs:
       github.event.inputs.environment == 'Production'
     uses: ./.github/workflows/cdk-deploy.yml
     with:
-      version: ${{ github.event.inputs.environment || steps.release.outputs.version }}
+      version: ${{ github.event.inputs.environment || needs.build.outputs.version }}
       awsRegion: us-east-2
       environment: Production
       context: >
