@@ -44,6 +44,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        npm install -g @semantic-release/exec
         VERSION=$(npx semantic-release) || exit 1
         echo "::set-output name=version::$VERSION"
 
