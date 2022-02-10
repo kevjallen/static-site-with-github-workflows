@@ -76,7 +76,7 @@ jobs:
       !failure() &&
       !github.event.inputs.version &&
       !needs.setup.outputs.version
-    uses: kevjallen/static-site/.github/workflows/cdk-deploy@master
+    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
     with:
       environment: Integration
       context: >-
