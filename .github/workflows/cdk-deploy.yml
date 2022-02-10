@@ -69,7 +69,8 @@ jobs:
       if: ${{ inputs.context }}
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
-          ${{ inputs.context }})"
+          <(echo "{\"stackName\":\"${{ github.sha }}\"}") ${{ inputs.context }})"
+
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Deploy environment
@@ -89,4 +90,5 @@ jobs:
       run: |
         _internals/shell-functions/npm-run-cdk.sh 'destroy' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }}
+          ${{ steps.cdk_context.outputs.cdk_context_args }} '-f'
+

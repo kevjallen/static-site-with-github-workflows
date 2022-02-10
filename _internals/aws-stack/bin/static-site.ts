@@ -1,20 +1,17 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-import * as pokemon from 'pokemon';
-
 import { StaticSiteStack } from '../lib/static-site-stack';
 import { Duration } from 'aws-cdk-lib';
 
 const app = new cdk.App();
 
-new StaticSiteStack(app, app.node.tryGetContext('stackName'), {
-  // name of hosted zone to create a record in
+const stackName = app.node.tryGetContext('stackName')
+
+new StaticSiteStack(app, stackName, {
   domainName: app.node.tryGetContext('domainName'),
-  // subdomain within the hosted zone or random pokemon
-  subdomain: app.node.tryGetContext('subdomain') || 
-    pokemon.random().toLowerCase(),
-  // path to folder or archive containing the site
+  preserveBucket: app.node.tryGetContext('preserveBucket'),
   siteContents: app.node.tryGetContext('siteContents'),
+  subdomain: app.node.tryGetContext('subdomain') || stackName.toLowerCase(),
 
   customHeadersBehavior: 
     JSON.parse(app.node.tryGetContext('customHeadersBehavior') || null),

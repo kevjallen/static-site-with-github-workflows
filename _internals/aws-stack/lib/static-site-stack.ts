@@ -1,4 +1,4 @@
-import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
@@ -14,10 +14,12 @@ import * as deploy from 'aws-cdk-lib/aws-s3-deployment';
 interface StaticSiteStackProps extends StackProps {
   domainName: string,
   siteContents: string,
-  subdomain: string
+  subdomain: string,
 
-  customHeadersBehavior?: cloudfront.ResponseCustomHeadersBehavior
+  customHeadersBehavior?: cloudfront.ResponseCustomHeadersBehavior,
   securityHeadersBehavior?: cloudfront.ResponseSecurityHeadersBehavior
+
+  preserveBucket?: boolean
 }
 
 export class StaticSiteStack extends Stack {
@@ -28,13 +30,16 @@ export class StaticSiteStack extends Stack {
       domainName: props.domainName 
     });
     const siteDomain = props.subdomain + '.' + props.domainName;
+    new CfnOutput(this, 'SiteDomain', { value: siteDomain })
 
     const oai = new cloudfront.OriginAccessIdentity(this, 'SiteOAI');
     const oaiS3CanonicalUserId = oai.cloudFrontOriginAccessIdentityS3CanonicalUserId;
 
     const bucket = new s3.Bucket(this, 'SiteBucket', {
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL
-    });
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: (props.preserveBucket == false) ? RemovalPolicy.DESTROY :
+        RemovalPolicy.RETAIN });
+        
     bucket.addToResourcePolicy(new iam.PolicyStatement({
       actions: ['s3:GetObject'],
       resources: [bucket.arnForObjects('*')],

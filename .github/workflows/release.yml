@@ -81,6 +81,7 @@ jobs:
       environment: Integration
       context: >-
         _internals/site-contexts/_common.json
+        _internals/site-contexts/env-integration.json
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
