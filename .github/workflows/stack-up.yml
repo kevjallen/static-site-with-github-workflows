@@ -102,5 +102,5 @@ jobs:
     - name: Run E2E test script
       if: ${{ inputs.testScript }}
       env:
-        SITE_E2E_TARGET_DOMAIN: ${{ needs.deploy.outputs.siteDomain }}
+        SITE_E2E_TARGET_DOMAIN: ${{ steps.cdk_synth.outputs.site_domain }}
       run: ${{ inputs.testScript }}
