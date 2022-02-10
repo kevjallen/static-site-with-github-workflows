@@ -87,7 +87,7 @@ jobs:
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           '--json' ${{ steps.cdk_context.outputs.cdk_context_args }})
 
-        SITE_DOMAIN=$(echo $TEMPLATE | jq -r '.Outputs.SiteDomain.Value')"
+        SITE_DOMAIN=$(echo "$TEMPLATE" | jq -r '.Outputs.SiteDomain.Value')
         echo "::set-output name=site_domain::$SITE_DOMAIN"
 
     - name: Deploy environment

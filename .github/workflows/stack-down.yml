@@ -25,7 +25,7 @@ on:
         required: true
 
 jobs:
-  clean:
+  down:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
 
