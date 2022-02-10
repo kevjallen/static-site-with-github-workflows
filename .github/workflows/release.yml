@@ -103,7 +103,6 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Download release candidate
-      if: ${{ !inputs.version }}
       uses: actions/download-artifact@v2
       with:
         name: ${{ needs.build.outputs.artifactBaseName }}
