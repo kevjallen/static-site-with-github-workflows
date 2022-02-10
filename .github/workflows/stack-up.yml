@@ -28,7 +28,7 @@ jobs:
   deploy:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -68,7 +68,7 @@ jobs:
       id: cdk_context
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
-          <(echo "{\"stackName\":\"${{ github.sha }}\"}") ${{ inputs.context }})"
+          <(echo "{\"stackName\":\"int-${{ github.sha }}\"}") ${{ inputs.context }})"
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Deploy environment

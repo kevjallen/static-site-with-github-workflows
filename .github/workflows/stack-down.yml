@@ -45,7 +45,7 @@ jobs:
       id: cdk_context
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
-          <(echo "{\"stackName\":\"${{ github.sha }}\"}") ${{ inputs.context }})"
+          <(echo "{\"stackName\":\"int-${{ github.sha }}\"}") ${{ inputs.context }})"
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Destroy environment
