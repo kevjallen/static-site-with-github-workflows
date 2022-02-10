@@ -85,7 +85,7 @@ jobs:
       stackName: int-${{ github.sha }}
       # site domain is made accessible with ${SITE_E2E_TARGET_DOMAIN}
       testScript: |
-        _internals/shell-functions/e2e-testing.sh "${SITE_E2E_TARGET_DOMAIN}"
+        _internals/shell-functions/run-e2e-tests-on.sh "${SITE_E2E_TARGET_DOMAIN}"
 
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
