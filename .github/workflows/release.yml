@@ -73,7 +73,7 @@ jobs:
         needs.setup.outputs.version ||
         needs.build.outputs.version
       )
-    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml
+    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
     with:
       version: >-
         ${{
@@ -99,7 +99,7 @@ jobs:
         needs.setup.outputs.version ||
         needs.build.outputs.version
       )
-    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml
+    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
     with:
       version: >-
         ${{
