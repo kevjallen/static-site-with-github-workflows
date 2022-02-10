@@ -13,7 +13,7 @@ function run-e2e-tests-on {
   fi
 
   # TODO: create a better demo for E2E testing
-  RESPONSE_CODE=$(curl --silent --output /dev/null --write-out "%{http_code}" "$1")
+  RESPONSE_CODE=$(curl -L --silent --output /dev/null --write-out "%{http_code}" "$1")
   if [[ "$RESPONSE_CODE" -ne "200" ]]; then 
     echo "expected response code 200 (received $RESPONSE_CODE)"
     return 1; 
