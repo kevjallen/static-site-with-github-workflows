@@ -83,7 +83,7 @@ jobs:
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
       stackName: int-${{ github.sha }}
-      # site domain is made accessible in ${SITE_E2E_TARGET_DOMAIN}
+      # site domain is made accessible with ${SITE_E2E_TARGET_DOMAIN}
       testScript: |
         _internals/shell-functions/e2e-testing.sh "${SITE_E2E_TARGET_DOMAIN}"
 

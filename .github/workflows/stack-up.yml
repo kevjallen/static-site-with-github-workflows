@@ -34,8 +34,6 @@ jobs:
   deploy:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    outputs:
-      siteDomain: ${{ steps.cdk_synth.outputs.site_domain }}
 
     steps:
     - name: Checkout
@@ -98,16 +96,8 @@ jobs:
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }}
 
-  test:
-    needs: [deploy]
-    runs-on: ubuntu-latest
-
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v2
-
     - name: Run E2E test script
+      if: ${{ inputs.testScript }}
       env:
         SITE_E2E_TARGET_DOMAIN: ${{ needs.deploy.outputs.siteDomain }}
       run: ${{ inputs.testScript }}
