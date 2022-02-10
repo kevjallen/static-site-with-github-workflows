@@ -26,7 +26,8 @@ function npm-run-cdk {
   artifact=$(realpath -e "$ARTIFACT_PATH") || return 1
 
   cd "$AWS_STACK_PATH"
-  npm install && npm run cdk "${command}" -- "$@" -c siteContents="${artifact}"
+  npm install > /dev/null
+  npm run --silent cdk "${command}" -- "$@" -c siteContents="${artifact}"
 }
 
 npm-run-cdk "$@"

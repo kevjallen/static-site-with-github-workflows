@@ -82,6 +82,11 @@ jobs:
       context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
+      stackName: int-${{ github.sha }}
+      # site domain is made accessible in ${SITE_E2E_TARGET_DOMAIN}
+      testScript: |
+        _internals/shell-functions/e2e-testing.sh "${SITE_E2E_TARGET_DOMAIN}"
+
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -98,13 +103,13 @@ jobs:
       context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
+      stackName: int-${{ github.sha }}
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}          
     
-
   release:
     needs: [setup, build, integration]
     if: >-

@@ -7,6 +7,12 @@ on:
       environment:
         required: true
         type: string
+      stackName:
+        required: false
+        type: string
+      testScript:
+        required: false
+        type: string
       version:
         required: false
         type: string
@@ -28,6 +34,8 @@ jobs:
   deploy:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
+    outputs:
+      siteDomain: ${{ steps.cdk_synth.outputs.site_domain }}
 
     steps:
     - name: Checkout
@@ -67,9 +75,19 @@ jobs:
     - name: Read CDK context
       id: cdk_context
       run: |
-        CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
-          <(echo "{\"stackName\":\"int-${{ github.sha }}\"}") ${{ inputs.context }})"
+        CDK_CONTEXT_ARGS=$(_internals/shell-functions/context-args-from.sh \
+          <(echo "{\"stackName\":\"${{ inputs.stackName }}\"}") ${{ inputs.context }})
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
+
+    - name: Synth environment
+      id: cdk_synth
+      run: |
+        TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
+          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
+          '--json' ${{ steps.cdk_context.outputs.cdk_context_args }})
+
+        SITE_DOMAIN=$(echo $TEMPLATE | jq -r '.Outputs.SiteDomain.Value')"
+        echo "::set-output name=site_domain::$SITE_DOMAIN"
 
     - name: Deploy environment
       env:
@@ -79,3 +97,17 @@ jobs:
         _internals/shell-functions/npm-run-cdk.sh 'deploy' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }}
+
+  test:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Run E2E test script
+      env:
+        SITE_E2E_TARGET_DOMAIN: ${{ needs.deploy.outputs.siteDomain }}
+      run: ${{ inputs.testScript }}
