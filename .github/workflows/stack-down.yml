@@ -1,4 +1,4 @@
-name: CDK Deploy
+name: Destroy stack
 
 on:
   workflow_call:
@@ -7,10 +7,10 @@ on:
       environment:
         required: true
         type: string
-      version:
-        required: true
-        type: string 
       context:
+        required: false
+        type: string
+      stackName:
         required: false
         type: string
 
@@ -25,7 +25,7 @@ on:
         required: true
 
 jobs:
-  deploy:
+  clean_up:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
 
@@ -44,24 +44,18 @@ jobs:
       run: |
         asdf plugin add jq && asdf install jq
 
-    - name: Download artifact
-      run: |
-        _internals/shell-functions/download-release.sh \
-          '${{ github.repository }}' '${{ inputs.version }}'
-
     - name: Read CDK context
       id: cdk_context
-      if: ${{ inputs.context != '' }}
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
-          ${{ inputs.context }})"
-        echo "::set-output name=cdk_context_args::"$CDK_CONTEXT_ARGS""
+          <(echo "{\"stackName\":\"${{ inputs.stackName }}\"}") ${{ inputs.context }})"
+        echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
-    - name: CDK deploy
+    - name: Destroy environment
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
       run: |
-        _internals/shell-functions/cdk-deploy-to.sh \
+        _internals/shell-functions/npm-run-cdk.sh 'destroy' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }}
+          '-f' ${{ steps.cdk_context.outputs.cdk_context_args }}

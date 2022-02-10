@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
-import { Duration } from 'aws-cdk-lib';
 import { StaticSiteStack } from '../lib/static-site-stack';
+import { Duration } from 'aws-cdk-lib';
 
 const app = new cdk.App();
 
-new StaticSiteStack(app, app.node.tryGetContext('stackName'), {
+const stackName = app.node.tryGetContext('stackName')
+
+new StaticSiteStack(app, stackName, {
   domainName: app.node.tryGetContext('domainName'),
+  preserveBucket: app.node.tryGetContext('preserveBucket'),
   siteContents: app.node.tryGetContext('siteContents'),
-  subdomain: app.node.tryGetContext('subdomain'),
+  subdomain: app.node.tryGetContext('subdomain') || stackName.toLowerCase(),
 
   customHeadersBehavior: 
     JSON.parse(app.node.tryGetContext('customHeadersBehavior') || null),
