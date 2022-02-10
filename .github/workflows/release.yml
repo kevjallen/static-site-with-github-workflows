@@ -80,7 +80,6 @@ jobs:
           needs.setup.outputs.version ||
           needs.build.outputs.version
         }}
-      awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
       environment: Preview
       context: >-
         _internals/site-contexts/_common.json
@@ -89,6 +88,7 @@ jobs:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
 
   production:
     needs: [setup, build, preview]
@@ -106,7 +106,6 @@ jobs:
           needs.setup.outputs.version ||
           needs.build.outputs.version
         }}
-      awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
       environment: Production
       context: >-
         _internals/site-contexts/_common.json
@@ -115,3 +114,4 @@ jobs:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}

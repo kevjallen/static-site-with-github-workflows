@@ -4,9 +4,6 @@ on:
   workflow_call:
 
     inputs:
-      awsRegion:
-        required: true
-        type: string
       environment:
         required: true
         type: string
@@ -19,6 +16,8 @@ on:
 
     secrets:
       awsAccountId:
+        required: true
+      awsRegion:
         required: true
       awsAccessKeyId:
         required: true
@@ -64,5 +63,5 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
       run: |
         _internals/shell-functions/cdk-deploy-to.sh \
-          '${{ secrets.awsAccountId }}' '${{ inputs.awsRegion }}' \
+          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }}
