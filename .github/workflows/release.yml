@@ -70,13 +70,13 @@ jobs:
         name: ${{ steps.artifact_path.outputs.artifact_basename }}
         path: ${{ steps.artifact_path.outputs.artifact_dirname }}
 
-  integration:
+  integration_up:
     needs: [setup, build]
     if: >-
       !failure() &&
       !github.event.inputs.version &&
       !needs.setup.outputs.version
-    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
+    uses: kevjallen/static-site/.github/workflows/stack-up.yml@master
     with:
       environment: Integration
       context: >-
@@ -88,8 +88,25 @@ jobs:
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}   
 
+  integration_down:
+    needs: [setup, build, integration_up]
+    if: >-
+      !failure()
+    uses: kevjallen/static-site/.github/workflows/stack-down.yml@master
+    with: 
+      environment: Integration
+      context: >-
+        _internals/site-contexts/_common.json
+        _internals/site-contexts/env-integration.json
+    secrets:
+      awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
+      awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}          
+    
+
   release:
-    needs: [setup, build, integration]
+    needs: [setup, build, integration_up]
     if: >-
       !failure() &&
       !github.event.inputs.version &&
@@ -118,14 +135,14 @@ jobs:
         echo "::set-output name=version::$VERSION"
 
   preview:
-    needs: [setup, build, integration, release]
+    needs: [setup, build, integration_up, release]
     if: >-
       !failure() && (
         github.event.inputs.version ||
         needs.setup.outputs.version ||
         needs.release.outputs.version
       )
-    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
+    uses: kevjallen/static-site/.github/workflows/stack-up.yml@master
     with:
       version: >-
         ${{
@@ -144,14 +161,14 @@ jobs:
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
 
   production:
-    needs: [setup, build, integration, release, preview]
+    needs: [setup, build, integration_up, release, preview]
     if: >-
       !failure() && (
         github.event.inputs.version ||
         needs.setup.outputs.version ||
         needs.release.outputs.version
       )
-    uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
+    uses: kevjallen/static-site/.github/workflows/stack-up.yml@master
     with:
       version: >-
         ${{

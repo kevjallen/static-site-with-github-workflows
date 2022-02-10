@@ -38,7 +38,9 @@ export class StaticSiteStack extends Stack {
     const bucket = new s3.Bucket(this, 'SiteBucket', {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: (props.preserveBucket == false) ? RemovalPolicy.DESTROY :
-        RemovalPolicy.RETAIN });
+        RemovalPolicy.RETAIN,
+      autoDeleteObjects: (props.preserveBucket == false)
+    });
         
     bucket.addToResourcePolicy(new iam.PolicyStatement({
       actions: ['s3:GetObject'],
