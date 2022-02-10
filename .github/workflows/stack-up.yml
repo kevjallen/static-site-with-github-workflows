@@ -79,6 +79,9 @@ jobs:
 
     - name: Synth environment
       id: cdk_synth
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
       run: |
         TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
