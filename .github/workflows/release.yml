@@ -115,7 +115,8 @@ jobs:
     if: >-
       !failure() &&
       !github.event.inputs.version &&
-      !needs.setup.outputs.version
+      !needs.setup.outputs.version &&
+      !github.event.pull_request
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.version }} 
