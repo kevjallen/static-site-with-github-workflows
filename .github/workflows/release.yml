@@ -95,8 +95,6 @@ jobs:
 
   post_integration:
     needs: [setup, build, integration]
-    if: >-
-      !failure()
     uses: kevjallen/static-site/.github/workflows/stack-down.yml@master
     with: 
       environment: Integration
