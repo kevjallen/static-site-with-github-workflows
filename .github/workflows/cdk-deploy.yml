@@ -8,8 +8,8 @@ on:
         required: true
         type: string
       version:
-        required: true
-        type: string 
+        required: false
+        type: string
       context:
         required: false
         type: string
@@ -44,24 +44,49 @@ jobs:
       run: |
         asdf plugin add jq && asdf install jq
 
-    - name: Download artifact
+    - name: Get artifact location 
+      id: artifact_path
+      run: |
+        source _internals/defaults.sh
+        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH")"
+        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"  
+
+    - name: Download release candidate
+      if: ${{ !inputs.version }}
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ steps.artifact_path.outputs.artifact_basename }}
+        path: ${{ steps.artifact_path.outputs.artifact_dirname }}
+
+    - name: Download official release
+      if: ${{ inputs.version }}
       run: |
         _internals/shell-functions/download-release.sh \
           '${{ github.repository }}' '${{ inputs.version }}'
 
     - name: Read CDK context
       id: cdk_context
-      if: ${{ inputs.context != '' }}
+      if: ${{ inputs.context }}
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
           ${{ inputs.context }})"
-        echo "::set-output name=cdk_context_args::"$CDK_CONTEXT_ARGS""
+        echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
-    - name: CDK deploy
+    - name: Deploy environment
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
       run: |
-        _internals/shell-functions/cdk-deploy-to.sh \
+        _internals/shell-functions/npm-run-cdk.sh 'deploy' \
+          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
+          ${{ steps.cdk_context.outputs.cdk_context_args }}
+
+    - name: Destroy environment
+      if: ${{ !inputs.version }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
+      run: |
+        _internals/shell-functions/npm-run-cdk.sh 'destroy' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }}

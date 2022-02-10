@@ -43,7 +43,8 @@ jobs:
       !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.release.outputs.version }}
+      artifactBaseName: ${{ steps.artifact_path.outputs.artifact_basename }}
+      artifactDirName: ${{ steps.artifact_path.outputs.artifact_dirname }}
 
     steps:
     - name: Checkout
@@ -56,7 +57,51 @@ jobs:
       run: |
         _internals/shell-functions/create-artifact.sh
 
-    - name: Publish release
+    - name: Get artifact location
+      id: artifact_path
+      run: |
+        source _internals/defaults.sh
+        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH")"
+        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")" 
+
+    - name: Upload release candidate
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ steps.artifact_path.outputs.artifact_basename }}
+        path: ${{ steps.artifact_path.outputs.artifact_dirname }}
+
+  integration:
+    needs: [setup, build]
+    if: >-
+      !failure() &&
+      !github.event.inputs.version &&
+      !needs.setup.outputs.version
+    uses: kevjallen/static-site/.github/workflows/cdk-deploy@master
+    with:
+      environment: Integration
+      context: >-
+        _internals/site-contexts/_common.json
+    secrets:
+      awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
+      awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}   
+
+  release:
+    needs: [setup, build, integration]
+    if: >-
+      !failure() &&
+      !github.event.inputs.version &&
+      !needs.setup.outputs.version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }} 
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Create official release
       id: release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,12 +111,12 @@ jobs:
         echo "::set-output name=version::$VERSION"
 
   preview:
-    needs: [setup, build]
+    needs: [setup, build, integration, release]
     if: >-
       !failure() && (
         github.event.inputs.version ||
         needs.setup.outputs.version ||
-        needs.build.outputs.version
+        needs.release.outputs.version
       )
     uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
     with:
@@ -79,7 +124,7 @@ jobs:
         ${{
           github.event.inputs.version ||
           needs.setup.outputs.version ||
-          needs.build.outputs.version
+          needs.release.outputs.version
         }}
       environment: Preview
       context: >-
@@ -92,12 +137,12 @@ jobs:
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
 
   production:
-    needs: [setup, build, preview]
+    needs: [setup, build, integration, release, preview]
     if: >-
       !failure() && (
         github.event.inputs.version ||
         needs.setup.outputs.version ||
-        needs.build.outputs.version
+        needs.release.outputs.version
       )
     uses: kevjallen/static-site/.github/workflows/cdk-deploy.yml@master
     with:
@@ -105,7 +150,7 @@ jobs:
         ${{
           github.event.inputs.version ||
           needs.setup.outputs.version ||
-          needs.build.outputs.version
+          needs.release.outputs.version
         }}
       environment: Production
       context: >-
