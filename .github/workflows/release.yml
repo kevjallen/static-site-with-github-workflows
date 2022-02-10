@@ -2,9 +2,10 @@ name: Release
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
 
   push:
-    branches: [ master ]
+    branches: [master]
     
   workflow_dispatch:
     inputs:
