@@ -91,4 +91,3 @@ jobs:
         _internals/shell-functions/npm-run-cdk.sh 'destroy' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }} '-f'
-
