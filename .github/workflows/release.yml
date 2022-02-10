@@ -70,7 +70,7 @@ jobs:
         name: ${{ steps.artifact_path.outputs.artifact_basename }}
         path: ${{ steps.artifact_path.outputs.artifact_dirname }}
 
-  integration_up:
+  integration:
     needs: [setup, build]
     if: >-
       !failure() &&
@@ -88,8 +88,8 @@ jobs:
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}   
 
-  integration_down:
-    needs: [setup, build, integration_up]
+  post_integration:
+    needs: [setup, build, integration]
     if: >-
       !failure()
     uses: kevjallen/static-site/.github/workflows/stack-down.yml@master
@@ -106,7 +106,7 @@ jobs:
     
 
   release:
-    needs: [setup, build, integration_up]
+    needs: [setup, build, integration]
     if: >-
       !failure() &&
       !github.event.inputs.version &&
@@ -135,7 +135,7 @@ jobs:
         echo "::set-output name=version::$VERSION"
 
   preview:
-    needs: [setup, build, integration_up, release]
+    needs: [setup, build, integration, release]
     if: >-
       !failure() && (
         github.event.inputs.version ||
@@ -161,7 +161,7 @@ jobs:
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
 
   production:
-    needs: [setup, build, integration_up, release, preview]
+    needs: [setup, build, integration, release, preview]
     if: >-
       !failure() && (
         github.event.inputs.version ||

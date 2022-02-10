@@ -17,6 +17,11 @@ function npm-run-cdk {
   export CDK_DEPLOY_REGION="$3"
   shift; shift; shift
 
+  if [[ "${command}" -eq "destroy" ]]; then
+    mkdir -p $(dirname "$ARTIFACT_PATH")
+    touch "$ARTIFACT_PATH"
+  fi
+
   local artifact
   artifact=$(realpath -e "$ARTIFACT_PATH") || return 1
 
