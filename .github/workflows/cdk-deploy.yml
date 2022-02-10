@@ -44,12 +44,12 @@ jobs:
       run: |
         asdf plugin add jq && asdf install jq
 
-    - name: Get artifact location 
+    - name: Get artifact defaults
       id: artifact_path
       run: |
         source _internals/defaults.sh
-        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH")"
-        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"  
+        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH" .zip)"
+        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
 
     - name: Download release candidate
       if: ${{ !inputs.version }}
@@ -70,7 +70,6 @@ jobs:
       run: |
         CDK_CONTEXT_ARGS="$(_internals/shell-functions/context-args-from.sh \
           <(echo "{\"stackName\":\"${{ github.sha }}\"}") ${{ inputs.context }})"
-
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Deploy environment

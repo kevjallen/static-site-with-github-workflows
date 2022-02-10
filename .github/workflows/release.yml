@@ -57,12 +57,12 @@ jobs:
       run: |
         _internals/shell-functions/create-artifact.sh
 
-    - name: Get artifact location
+    - name: Get artifact defaults
       id: artifact_path
       run: |
         source _internals/defaults.sh
-        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH")"
-        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")" 
+        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH" .zip)"
+        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
 
     - name: Upload release candidate
       uses: actions/upload-artifact@v2
@@ -101,6 +101,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
+    - name: Download release candidate
+      if: ${{ !inputs.version }}
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ needs.build.outputs.artifactBaseName }}
+        path: ${{ needs.build.outputs.artifactDirName }}
 
     - name: Create official release
       id: release
