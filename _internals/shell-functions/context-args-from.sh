@@ -3,7 +3,7 @@
 source _internals/defaults.sh
 
 function usage {
-  echo "usage: $0 variable cdk_context_json1 [cdk_context_json2] ..."
+  echo "usage: $0 cdk_context_json1 [cdk_context_json2] ..."
 }
 
 function context-args-from {
