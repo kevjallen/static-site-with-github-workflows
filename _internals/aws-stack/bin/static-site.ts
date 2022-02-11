@@ -9,7 +9,7 @@ const stackName = app.node.tryGetContext('stackName')
 
 new StaticSiteStack(app, stackName, {
   domainName: app.node.tryGetContext('domainName'),
-  preserveBucket: app.node.tryGetContext('preserveBucket'),
+  preserveBucket: !(app.node.tryGetContext('preserveBucket') == 'false'),
   siteContents: app.node.tryGetContext('siteContents'),
   subdomain: app.node.tryGetContext('subdomain') || stackName.toLowerCase(),
 
