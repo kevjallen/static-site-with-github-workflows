@@ -32,4 +32,4 @@ The behavior of this workflow depends on the event that triggered it:
   - Runs only the deployment jobs with specified version
 - **Manual start (without version)**:
   - Runs the full workflow if a version is not detected for HEAD / latest commit
-    - Otherwise, runs the deployment jobs with detected version
+    - Otherwise, runs only the deployment jobs with detected version
