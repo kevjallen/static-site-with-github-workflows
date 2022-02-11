@@ -55,6 +55,7 @@ jobs:
       run: |
         source _internals/defaults.sh
         echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH" .zip)"
+        echo "::set-output name=artifact_filename::$(basename "$ARTIFACT_PATH")"
         echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
 
     - name: Download release candidate
@@ -68,7 +69,8 @@ jobs:
       if: ${{ inputs.version }}
       run: |
         _internals/shell-functions/download-release.sh \
-          '${{ github.repository }}' '${{ inputs.version }}'
+          '${{ github.repository }}' '${{ inputs.version }}' \
+          '${{ steps.artifact_path.outputs.artifact_filename }}'
 
     - name: Read CDK context
       id: cdk_context
