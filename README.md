@@ -8,7 +8,7 @@ This repository demonstrates CI/CD for a static website
 
 Three "environments" are included:
 - Integration: transient sites that are deployed, tested, and destroyed during workflow runs
-- Preview: the staging site that is deployed to following successful integration
+- Preview: the "staging" site that is deployed following successful integration
 - Production: the main site that contains the latest end-user features
 
 ### Secrets
