@@ -42,7 +42,7 @@ jobs:
       !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
-      artifactBaseName: ${{ steps.defaults.outputs.artifact_basename }}
+      artifactName: ${{ steps.defaults.outputs.artifact_name }}
       artifactDirName: ${{ steps.defaults.outputs.artifact_dirname }}
 
     steps:
@@ -127,7 +127,7 @@ jobs:
     - name: Download release candidate
       uses: actions/download-artifact@v2
       with:
-        name: ${{ needs.build.outputs.artifactBaseName }}
+        name: ${{ needs.build.outputs.artifactName }}
         path: ${{ needs.build.outputs.artifactDirName }}
 
     - name: Create official release
