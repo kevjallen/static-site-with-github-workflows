@@ -52,6 +52,7 @@ export class StaticSiteStack extends Stack {
       } else if (zone) {
         certificate = new acm.DnsValidatedCertificate(this, 'SiteCertificate', {
           domainName: siteDomain,
+          region: 'us-east-1',
           hostedZone: zone
         })
       }
