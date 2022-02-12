@@ -98,9 +98,10 @@ export class StaticSiteStack extends Stack {
     new CfnOutput(this, 'DistributionId', { value: distribution.distributionId })
 
     if (zone) {
+      const target = new targets.CloudFrontTarget(distribution) 
       new route53.ARecord(this, 'SiteAliasRecord', {
-        recordName: props.domainName,
-        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+        recordName: siteDomain,
+        target: route53.RecordTarget.fromAlias(target),
         zone
       })
     }
