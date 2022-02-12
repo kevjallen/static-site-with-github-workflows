@@ -76,14 +76,14 @@ jobs:
       !failure() &&
       !github.event.inputs.version &&
       !needs.setup.outputs.version
-    uses: kevjallen/static-site/.github/workflows/stack-up.yml@master
+    uses: ./.github/workflows/stack-up.yml
     with:
       environment: Integration
       context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
       stackName: int-${{ github.sha }}
-      # site domain is made accessible with ${SITE_E2E_TARGET_DOMAIN}
+      # site domain is made accessible to caller with ${SITE_E2E_TARGET_DOMAIN}
       testScript: |
         _internals/shell-functions/run-e2e-tests-on.sh "${SITE_E2E_TARGET_DOMAIN}"
 
@@ -97,7 +97,7 @@ jobs:
     needs: [setup, build, integration]
     if: >-
       always()
-    uses: kevjallen/static-site/.github/workflows/stack-down.yml@master
+    uses: ./.github/workflows/stack-down.yml
     with: 
       environment: Integration
       context: >-
@@ -148,7 +148,7 @@ jobs:
         needs.setup.outputs.version ||
         needs.release.outputs.version
       )
-    uses: kevjallen/static-site/.github/workflows/stack-up.yml@master
+    uses: ./.github/workflows/stack-up.yml
     with:
       version: >-
         ${{
@@ -174,7 +174,7 @@ jobs:
         needs.setup.outputs.version ||
         needs.release.outputs.version
       )
-    uses: kevjallen/static-site/.github/workflows/stack-up.yml@master
+    uses: ./.github/workflows/stack-up.yml
     with:
       version: >-
         ${{
