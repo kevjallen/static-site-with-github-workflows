@@ -97,4 +97,4 @@ jobs:
     - name: Run E2E tests
       run: |
         _internals/shell-functions/run-e2e-tests-on.sh \
-          ${{ steps.cdk_synth.outputs.template }}
+          "${{ steps.cdk_synth.outputs.template }}"
