@@ -9,3 +9,7 @@ github_username: kevjallen
 theme: minima
 plugins:
   - jekyll-feed
+
+exclude:
+  - LICENSE
+  - README.md
