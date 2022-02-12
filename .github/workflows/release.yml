@@ -43,8 +43,8 @@ jobs:
       !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
-      artifactBaseName: ${{ steps.artifact_path.outputs.artifact_basename }}
-      artifactDirName: ${{ steps.artifact_path.outputs.artifact_dirname }}
+      artifactBaseName: ${{ steps.defaults.outputs.artifact_basename }}
+      artifactDirName: ${{ steps.defaults.outputs.artifact_dirname }}
 
     steps:
     - name: Checkout
@@ -58,7 +58,7 @@ jobs:
         _internals/shell-functions/create-artifact.sh
 
     - name: Get artifact defaults
-      id: artifact_path
+      id: defaults
       run: |
         source _internals/defaults.sh
         echo "::set-output name=artifact_name::$(basename "$ARTIFACT_PATH" .zip)"
@@ -67,8 +67,8 @@ jobs:
     - name: Upload release candidate
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ steps.artifact_path.outputs.artifact_name }}
-        path: ${{ steps.artifact_path.outputs.artifact_dirname }}
+        name: ${{ steps.defaults.outputs.artifact_name }}
+        path: ${{ steps.defaults.outputs.artifact_dirname }}
 
   integration:
     needs: [setup, build]
