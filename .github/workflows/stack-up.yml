@@ -90,7 +90,7 @@ jobs:
         CDK_USER_ARGS: ${{ inputs.cdkArguments }} 
       run: |
         TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
-          "$AWS_ACCOUNT_ID" "$AWS_REGION" "$CDK_CONTEXT_ARGS" "$CDK_USER_ARGS")
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" $CDK_CONTEXT_ARGS $CDK_USER_ARGS)
         echo "::set-output name=template::$(echo "$TEMPLATE" | jq -c)"
 
     - name: Deploy environment
@@ -103,7 +103,7 @@ jobs:
         CDK_USER_ARGS: ${{ inputs.cdkArguments }}
       run: |
         _internals/shell-functions/npm-run-cdk.sh 'deploy' \
-          "$AWS_ACCOUNT_ID" "$AWS_REGION" "$CDK_CONTEXT_ARGS" "$CDK_USER_ARGS"
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" $CDK_CONTEXT_ARGS $CDK_USER_ARGS
 
     - name: Run E2E tests
       env:
