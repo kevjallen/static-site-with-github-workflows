@@ -13,7 +13,7 @@ if [[ -z "$GITHUB_SERVER_URL" ]]; then
 fi
 
 if [[ -z "$SITE_CONTENTS_RELPATH" ]]; then
-  SITE_CONTENTS_RELPATH=$(realpath --relative-to="$AWS_STACK_PATH" "$ARTIFACT_PATH")
+  SITE_CONTENTS_RELPATH=$(realpath -m --relative-to="$AWS_STACK_PATH" "$ARTIFACT_PATH")
 fi
 
 if [[ -z "${CDK_GLOBAL_ARGS}" ]]; then
