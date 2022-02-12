@@ -62,4 +62,4 @@ jobs:
         CDK_USER_ARGS: ${{ inputs.cdkArguments }}
       run: |
         _internals/shell-functions/npm-run-cdk.sh 'destroy' \
-          "$AWS_ACCOUNT_ID" "$AWS_REGION" $CDK_CONTEXT_ARGS $CDK_USER_ARGS
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" -f $CDK_CONTEXT_ARGS $CDK_USER_ARGS
