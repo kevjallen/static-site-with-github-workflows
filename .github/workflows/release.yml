@@ -61,13 +61,13 @@ jobs:
       id: artifact_path
       run: |
         source _internals/defaults.sh
-        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH" .zip)"
+        echo "::set-output name=artifact_name::$(basename "$ARTIFACT_PATH" .zip)"
         echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
 
     - name: Upload release candidate
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ steps.artifact_path.outputs.artifact_basename }}
+        name: ${{ steps.artifact_path.outputs.artifact_name }}
         path: ${{ steps.artifact_path.outputs.artifact_dirname }}
 
   integration:
@@ -84,9 +84,6 @@ jobs:
         _internals/site-contexts/env-integration.json
         <(echo "{\"stackName\":\"StaticSite-Integration-${{ github.sha }}\"}")
         <(echo "{\"subdomain\":\"${{ github.sha }}\"}")
-      # site domain is made accessible to caller with ${SITE_E2E_TARGET_DOMAIN}
-      testScript: |
-        _internals/shell-functions/run-e2e-tests-on.sh "${SITE_E2E_TARGET_DOMAIN}"
 
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}

@@ -7,9 +7,6 @@ on:
       environment:
         required: true
         type: string
-      testScript:
-        required: false
-        type: string
       version:
         required: false
         type: string
@@ -48,26 +45,26 @@ jobs:
         asdf plugin add jq && asdf install jq
 
     - name: Get artifact defaults
-      id: artifact_path
+      id: defaults
       run: |
         source _internals/defaults.sh
-        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH" .zip)"
-        echo "::set-output name=artifact_filename::$(basename "$ARTIFACT_PATH")"
+        echo "::set-output name=artifact_name::$(basename "$ARTIFACT_PATH" .zip)"
         echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
+        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH")"
 
     - name: Download release candidate
       if: ${{ !inputs.version }}
       uses: actions/download-artifact@v2
       with:
-        name: ${{ steps.artifact_path.outputs.artifact_basename }}
-        path: ${{ steps.artifact_path.outputs.artifact_dirname }}
+        name: ${{ steps.defaults.outputs.artifact_name }}
+        path: ${{ steps.defaults.outputs.artifact_dirname }}
 
     - name: Download official release
       if: ${{ inputs.version }}
       run: |
         _internals/shell-functions/download-release.sh \
           '${{ github.repository }}' '${{ inputs.version }}' \
-          '${{ steps.artifact_path.outputs.artifact_filename }}'
+          '${{ steps.defaults.outputs.artifact_basename }}'
 
     - name: Read CDK context
       id: cdk_context
@@ -84,10 +81,9 @@ jobs:
       run: |
         TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          '--json' ${{ steps.cdk_context.outputs.cdk_context_args }})
-
-        SITE_DOMAIN=$(echo "$TEMPLATE" | jq -r '.Outputs.SiteDomain.Value')
-        echo "::set-output name=site_domain::$SITE_DOMAIN"
+          ${{ steps.cdk_context.outputs.cdk_context_args }}
+        )
+        echo "::set-output name=template::$TEMPLATE"; echo "$TEMPLATE"
 
     - name: Deploy environment
       env:
@@ -98,8 +94,7 @@ jobs:
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }}
 
-    - name: Run E2E test script
-      if: ${{ inputs.testScript }}
-      env:
-        SITE_E2E_TARGET_DOMAIN: ${{ steps.cdk_synth.outputs.site_domain }}
-      run: ${{ inputs.testScript }}
+    - name: Run E2E tests
+      run: |
+        _internals/shell-functions/run-e2e-tests-on.sh \
+          '${{ steps.cdk_synth.outputs.template }}'

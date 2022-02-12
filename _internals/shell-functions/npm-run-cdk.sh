@@ -17,17 +17,9 @@ function npm-run-cdk {
   export CDK_DEPLOY_REGION="$3"
   shift; shift; shift
 
-  if [[ "${command}" -eq "destroy" ]]; then
-    mkdir -p $(dirname "$ARTIFACT_PATH")
-    touch "$ARTIFACT_PATH"
-  fi
-
-  local artifact
-  artifact=$(realpath -e "$ARTIFACT_PATH") || return 1
-
   cd "$AWS_STACK_PATH"
   npm install > /dev/null
-  npm run --silent cdk "${command}" -- "$@" -c siteContents="${artifact}"
+  npm run --silent cdk "${command}" -- "$@" "${CDK_GLOBAL_ARGS[@]}"
 }
 
 npm-run-cdk "$@"

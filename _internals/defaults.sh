@@ -1,13 +1,22 @@
 #! /bin/bash
 
-if [[ -z "$ARTIFACT_PATH" ]]; then
+[[ -z "$ARTIFACT_PATH" ]] && {
   ARTIFACT_PATH='_artifact/site.zip'
-fi
+}
 
-if [[ -z "$AWS_STACK_PATH" ]]; then
+[[ -z "$AWS_STACK_PATH" ]] && {
   AWS_STACK_PATH='_internals/aws-stack'
-fi
+}
 
-if [[ -z "$GITHUB_SERVER_URL" ]]; then
+[[ -z "$GITHUB_SERVER_URL" ]] && {
   GITHUB_SERVER_URL='https://github.com'
-fi
+}
+
+[[ -z "$SITE_CONTENTS_RELPATH" ]] && {
+  SITE_CONTENTS_RELPATH=$(realpath --relative-to="$AWS_STACK_PATH" "$ARTIFACT_PATH")
+}
+
+[[ -z "${CDK_GLOBAL_ARGS[@]}"]] && {
+  CDK_GLOBAL_ARGS+=("-c" "siteContentsPath=$SITE_CONTENTS_RELPATH")
+  CDK_GLOBAL_ARGS+=("--json")
+}

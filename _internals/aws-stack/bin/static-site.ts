@@ -10,7 +10,7 @@ new StaticSiteStack(app, app.node.tryGetContext('stackName'), {
   certificateArn: app.node.tryGetContext('certificateArn'),
   forceDestroy: app.node.tryGetContext('forceDestroy'),
   hostedZoneId: app.node.tryGetContext('hostedZoneId'),
-  siteContentPath: app.node.tryGetContext('siteContentPath'),
+  siteContentsPath: app.node.tryGetContext('siteContentsPath'),
   subdomain: app.node.tryGetContext('subdomain'),
 
   responseBehaviors:

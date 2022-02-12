@@ -17,7 +17,7 @@ interface StaticSiteStackBaseProps extends StackProps {
     customHeaders?: cloudfront.ResponseCustomHeader[]
     securityHeaders?: cloudfront.ResponseSecurityHeadersBehavior
   }
-  siteContentPath?: string
+  siteContentsPath?: string
 }
 
 export type StaticSiteStackProps = StaticSiteStackBaseProps & (
@@ -106,12 +106,12 @@ export class StaticSiteStack extends Stack {
       })
     }
 
-    if (props.siteContentPath) {
+    if (props.siteContentsPath) {
       new deploy.BucketDeployment(this, 'SiteDeployment', {
         destinationBucket: bucket,
         distribution,
         distributionPaths: ['/*'],
-        sources: [deploy.Source.asset(props.siteContentPath)]
+        sources: [deploy.Source.asset(props.siteContentsPath)]
       })
     }
   }
