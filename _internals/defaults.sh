@@ -18,6 +18,7 @@ fi
 
 if [[ -z "$CDK_GLOBAL_ARGS" ]]; then
   if [[ ! -z "$SITE_CONTENTS_RELPATH" ]]; then
+    # include site artifact in CDK context when it exists
     CDK_GLOBAL_ARGS+=("-c" "siteContentsPath=$SITE_CONTENTS_RELPATH")
   fi
   CDK_GLOBAL_ARGS+=("--json")
