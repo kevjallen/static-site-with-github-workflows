@@ -11,6 +11,7 @@ new StaticSiteStack(app, app.node.tryGetContext('stackName'), {
   forceDestroy: app.node.tryGetContext('forceDestroy'),
   hostedZoneId: app.node.tryGetContext('hostedZoneId'),
   siteContentPath: app.node.tryGetContext('siteContentPath'),
+  subdomain: app.node.tryGetContext('subdomain'),
 
   responseBehaviors:
     JSON.parse(app.node.tryGetContext('responseBehaviors') || null, (k, v) => {

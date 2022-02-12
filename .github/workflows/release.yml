@@ -82,7 +82,8 @@ jobs:
       context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
-      stackName: int-${{ github.sha }}
+        <(echo "{\"stackName\":\"${{ inputs.stackName }}\"}")
+        <(echo "{\"subdomain\":\"${{ github.sha }}\"}")
       # site domain is made accessible to caller with ${SITE_E2E_TARGET_DOMAIN}
       testScript: |
         _internals/shell-functions/run-e2e-tests-on.sh "${SITE_E2E_TARGET_DOMAIN}"

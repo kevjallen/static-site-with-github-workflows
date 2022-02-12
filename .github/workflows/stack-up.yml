@@ -7,9 +7,6 @@ on:
       environment:
         required: true
         type: string
-      stackName:
-        required: false
-        type: string
       testScript:
         required: false
         type: string
@@ -76,7 +73,7 @@ jobs:
       id: cdk_context
       run: |
         CDK_CONTEXT_ARGS=$(_internals/shell-functions/context-args-from.sh \
-          <(echo "{\"stackName\":\"${{ inputs.stackName }}\"}") ${{ inputs.context }})
+          ${{ inputs.context }})
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Synth environment
