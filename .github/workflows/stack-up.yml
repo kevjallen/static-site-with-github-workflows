@@ -75,7 +75,7 @@ jobs:
         CONTEXT_FILES: ${{ inputs.context }}
       run: |
         CDK_CONTEXT_ARGS=$(_internals/shell-functions/context-args-from.sh \
-          "$CONTEXT_FILES")
+          $CONTEXT_FILES)
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Synth environment
