@@ -1,3 +1,5 @@
 {
-  "preserveBucket": false
+  "domainName": "int.kevjallen.com",
+  "hostedZoneId": "Z0913243Z7DQU6G33XRB",
+  "forceDestroy": true
 }

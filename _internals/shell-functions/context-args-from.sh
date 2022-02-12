@@ -14,7 +14,7 @@ function context-args-from {
 
   local context="{}"
   while [[ ! -z "$1" ]]; do
-    context=$(jq -s '.[0] * .[1]' <(echo "${context}") "$1"); shift
+    context=$(jq -s '.[0] * .[1]' <(echo "${context}") "$1") || return 1; shift
   done
 
   local context_pairs

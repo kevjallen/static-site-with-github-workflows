@@ -7,17 +7,11 @@ on:
       environment:
         required: true
         type: string
-      stackName:
-        required: false
-        type: string
-      testScript:
-        required: false
-        type: string
       version:
-        required: false
         type: string
-      context:
-        required: false
+      contextFiles:
+        type: string
+      cdkArguments:
         type: string
 
     secrets:
@@ -51,32 +45,38 @@ jobs:
         asdf plugin add jq && asdf install jq
 
     - name: Get artifact defaults
-      id: artifact_path
+      id: defaults
       run: |
         source _internals/defaults.sh
-        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH" .zip)"
-        echo "::set-output name=artifact_filename::$(basename "$ARTIFACT_PATH")"
+        echo "::set-output name=artifact_name::$(basename "$ARTIFACT_PATH" .zip)"
         echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
+        echo "::set-output name=artifact_basename::$(basename "$ARTIFACT_PATH")"
 
     - name: Download release candidate
       if: ${{ !inputs.version }}
       uses: actions/download-artifact@v2
       with:
-        name: ${{ steps.artifact_path.outputs.artifact_basename }}
-        path: ${{ steps.artifact_path.outputs.artifact_dirname }}
+        name: ${{ steps.defaults.outputs.artifact_name }}
+        path: ${{ steps.defaults.outputs.artifact_dirname }}
 
     - name: Download official release
       if: ${{ inputs.version }}
+      env: 
+        ARTIFACT_BASENAME: ${{ steps.defaults.outputs.artifact_basename }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        VERSION: ${{ inputs.version }}
       run: |
         _internals/shell-functions/download-release.sh \
-          '${{ github.repository }}' '${{ inputs.version }}' \
-          '${{ steps.artifact_path.outputs.artifact_filename }}'
+          "$GITHUB_REPOSITORY" "$VERSION" "$ARTIFACT_BASENAME"
 
     - name: Read CDK context
+      if: ${{ inputs.contextFiles }}
       id: cdk_context
+      env:
+        CONTEXT_FILES: ${{ inputs.contextFiles }}
       run: |
         CDK_CONTEXT_ARGS=$(_internals/shell-functions/context-args-from.sh \
-          <(echo "{\"stackName\":\"${{ inputs.stackName }}\"}") ${{ inputs.context }})
+          $CONTEXT_FILES)
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Synth environment
@@ -84,25 +84,29 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
+        AWS_ACCOUNT_ID: ${{ secrets.awsAccountId }}
+        AWS_REGION: ${{ secrets.awsRegion }}
+        CDK_CONTEXT_ARGS: ${{ steps.cdk_context.outputs.cdk_context_args }}
+        CDK_USER_ARGS: ${{ inputs.cdkArguments }} 
       run: |
         TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
-          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          '--json' ${{ steps.cdk_context.outputs.cdk_context_args }})
-
-        SITE_DOMAIN=$(echo "$TEMPLATE" | jq -r '.Outputs.SiteDomain.Value')
-        echo "::set-output name=site_domain::$SITE_DOMAIN"
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" $CDK_CONTEXT_ARGS $CDK_USER_ARGS)
+        echo "::set-output name=template::$(echo "$TEMPLATE" | jq -c)"
 
     - name: Deploy environment
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
+        AWS_ACCOUNT_ID: ${{ secrets.awsAccountId }}
+        AWS_REGION: ${{ secrets.awsRegion }}
+        CDK_CONTEXT_ARGS: ${{ steps.cdk_context.outputs.cdk_context_args }} 
+        CDK_USER_ARGS: ${{ inputs.cdkArguments }}
       run: |
         _internals/shell-functions/npm-run-cdk.sh 'deploy' \
-          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }}
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" $CDK_CONTEXT_ARGS $CDK_USER_ARGS
 
-    - name: Run E2E test script
-      if: ${{ inputs.testScript }}
+    - name: Run E2E tests
       env:
-        SITE_E2E_TARGET_DOMAIN: ${{ steps.cdk_synth.outputs.site_domain }}
-      run: ${{ inputs.testScript }}
+        TEMPLATE: ${{ steps.cdk_synth.outputs.template }}
+      run: |
+        _internals/shell-functions/run-e2e-tests-with.sh "$TEMPLATE"
