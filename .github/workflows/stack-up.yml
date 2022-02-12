@@ -81,9 +81,9 @@ jobs:
       run: |
         TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }}
+          ${{ steps.cdk_context.outputs.cdk_context_args }} \
         )
-        echo "::set-output name=template::$TEMPLATE"; echo "$TEMPLATE" | jq
+        echo "::set-output name=template::$TEMPLATE"
 
     - name: Deploy environment
       env:
