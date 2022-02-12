@@ -31,5 +31,5 @@ The behavior of this workflow depends on the event that triggered it:
 - **Manual start (with version)**: 
   - Runs only the deployment jobs with specified version
 - **Manual start (without version)**:
-  - Runs the full workflow if a version is not detected for the commit
+  - Runs the full workflow if a version is not detected for the commit being ran on
     - Otherwise, runs only the deployment jobs with detected version
