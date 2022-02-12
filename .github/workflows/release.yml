@@ -10,7 +10,6 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        required: false
         type: string
 
 jobs:
@@ -79,12 +78,12 @@ jobs:
     uses: ./.github/workflows/stack-up.yml
     with:
       environment: Integration
-      context: >-
+      contextFiles: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
-        <(echo "{\"stackName\":\"StaticSite-Integration-${{ github.sha }}\"}")
-        <(echo "{\"subdomain\":\"${{ github.sha }}\"}")
-
+      cdkArguments: >-
+        -c stackName=StaticSite-Integration-${{ github.sha }}
+        -c subdomain=${{ github.sha }}
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -98,11 +97,12 @@ jobs:
     uses: ./.github/workflows/stack-down.yml
     with: 
       environment: Integration
-      context: >-
+      contextFiles: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
-        <(echo "{\"stackName\":\"StaticSite-Integration-${{ github.sha }}\"}")
-        <(echo "{\"subdomain\":\"${{ github.sha }}\"}") 
+      cdkArguments: >-
+        -c stackName=StaticSite-Integration-${{ github.sha }}
+        -c subdomain=${{ github.sha }}
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -156,7 +156,7 @@ jobs:
           needs.release.outputs.version
         }}
       environment: Preview
-      context: >-
+      contextFiles: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-preview.json
     secrets:
@@ -182,7 +182,7 @@ jobs:
           needs.release.outputs.version
         }}
       environment: Production
-      context: >-
+      contextFiles: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-production.json
     secrets:

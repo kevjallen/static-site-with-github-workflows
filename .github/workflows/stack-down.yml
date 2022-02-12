@@ -7,8 +7,9 @@ on:
       environment:
         required: true
         type: string
-      context:
-        required: false
+      contextFiles:
+        type: string
+      cdkArguments:
         type: string
 
     secrets:
@@ -43,8 +44,9 @@ jobs:
 
     - name: Read CDK context
       id: cdk_context
+      if: ${{ inputs.contextFiles }}
       env:
-        CONTEXT_FILES: ${{ inputs.context }}
+        CONTEXT_FILES: ${{ inputs.contextFiles }}
       run: |
         CDK_CONTEXT_ARGS=$(_internals/shell-functions/context-args-from.sh \
           $CONTEXT_FILES)
@@ -56,7 +58,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
         AWS_ACCOUNT_ID: ${{ secrets.awsAccountId }}
         AWS_REGION: ${{ secrets.awsRegion }}
-        CDK_CONTEXT_ARGS: ${{ steps.cdk_context.outputs.cdk_context_args }} 
+        CDK_CONTEXT_ARGS: ${{ steps.cdk_context.outputs.cdk_context_args }}
+        CDK_USER_ARGS: ${{ inputs.cdkArguments }}
       run: |
         _internals/shell-functions/npm-run-cdk.sh 'destroy' \
-          "$AWS_ACCOUNT_ID" "$AWS_REGION" "$CDK_CONTEXT_ARGS"
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" "$CDK_CONTEXT_ARGS" "$CDK_USER_ARGS"

@@ -6,7 +6,7 @@ function usage {
   echo "usage: $0 cdk_synth_json"
 }
 
-function run-e2e-tests-on {
+function run-e2e-tests-with {
   if [[ ! $# -eq 1 ]]; then
     echo "invalid arguments (expected exactly 1, got $#)"
     usage; return 1
@@ -22,4 +22,4 @@ function run-e2e-tests-on {
   fi
 }
 
-run-e2e-tests-on "$@"
+run-e2e-tests-with "$@"
