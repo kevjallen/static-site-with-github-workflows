@@ -104,7 +104,8 @@ jobs:
       context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
-      stackName: int-${{ github.sha }}
+        <(echo "{\"stackName\":\"StaticSite-Integration-${{ github.sha }}\"}")
+        <(echo "{\"subdomain\":\"${{ github.sha }}\"}") 
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
