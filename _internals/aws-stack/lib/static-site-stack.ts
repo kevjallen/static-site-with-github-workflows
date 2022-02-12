@@ -14,7 +14,7 @@ interface StaticSiteStackBaseProps extends StackProps {
   domainName?: string
   forceDestroy?: boolean
   responseBehaviors?: {
-    customHeaders?: cloudfront.ResponseCustomHeadersBehavior
+    customHeaders?: cloudfront.ResponseCustomHeader[]
     securityHeaders?: cloudfront.ResponseSecurityHeadersBehavior
   }
   siteContentPath?: string
@@ -40,22 +40,22 @@ export class StaticSiteStack extends Stack {
     let certificate: acm.ICertificate | undefined
 
     if (props.domainName) {
-      // existing certificate is optional when we have a hosted zone
       if (props.hostedZoneId) {
-        zone = route53.HostedZone.fromHostedZoneId(this, 'HostedZone',
-          props.hostedZoneId)
+        zone = route53.HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
+          hostedZoneId: props.hostedZoneId,
+          zoneName: props.domainName
+        })
       }
       if (props.certificateArn) {
         certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
           props.certificateArn)
-      }
-      if (zone && !certificate) {
+      } else if (zone) {
         certificate = new acm.DnsValidatedCertificate(this, 'SiteCertificate', {
           domainName: siteDomain,
           hostedZone: zone
         })
       }
-      new CfnOutput(this, 'SiteDomain', { value: props.domainName })
+      new CfnOutput(this, 'SiteDomain', { value: siteDomain })
     }
 
     const oai = new cloudfront.OriginAccessIdentity(this, 'SiteOAI')
@@ -73,20 +73,26 @@ export class StaticSiteStack extends Stack {
     }))
     new CfnOutput(this, 'BucketName', { value: bucket.bucketName })
 
-    const headers = new cloudfront.ResponseHeadersPolicy(this, 'SiteHeaders', {
-      customHeadersBehavior:  props.responseBehaviors?.customHeaders,
-      securityHeadersBehavior: props.responseBehaviors?.securityHeaders
-    })
+    let headers: cloudfront.IResponseHeadersPolicy | undefined
+
+    if (props.responseBehaviors) {
+      headers = new cloudfront.ResponseHeadersPolicy(this, 'SiteHeaders', {
+        customHeadersBehavior: {
+          customHeaders: props.responseBehaviors?.customHeaders || []
+        },
+        securityHeadersBehavior: props.responseBehaviors?.securityHeaders
+      })
+    }
 
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
       certificate,
       defaultBehavior: {
         origin: new origins.S3Origin(bucket, { originAccessIdentity: oai }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        responseHeadersPolicy: headers
+        responseHeadersPolicy: headers || undefined
       },
       defaultRootObject: 'index.html',
-      domainNames: props.domainName ? [props.domainName] : undefined
+      domainNames: siteDomain? [siteDomain] : undefined
     })
     new CfnOutput(this, 'DistributionId', { value: distribution.distributionId })
 
