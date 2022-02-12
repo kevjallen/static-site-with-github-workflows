@@ -83,7 +83,7 @@ jobs:
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
           ${{ steps.cdk_context.outputs.cdk_context_args }} \
         )
-        echo "::set-output name=template::$(echo "$TEMPLATE" | jq -j)"
+        echo "::set-output name=template::$(echo "$TEMPLATE" | jq -c)"
 
     - name: Deploy environment
       env:
