@@ -28,7 +28,7 @@ jobs:
   deploy:
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -61,16 +61,21 @@ jobs:
 
     - name: Download official release
       if: ${{ inputs.version }}
+      env: 
+        ARTIFACT_BASENAME: ${{ steps.defaults.outputs.artifact_basename }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        VERSION: ${{ inputs.version }}
       run: |
         _internals/shell-functions/download-release.sh \
-          '${{ github.repository }}' '${{ inputs.version }}' \
-          '${{ steps.defaults.outputs.artifact_basename }}'
+          "$GITHUB_REPOSITORY" "$VERSION" "$ARTIFACT_BASENAME"
 
     - name: Read CDK context
       id: cdk_context
+      env:
+        CONTEXT_FILES: ${{ inputs.context }}
       run: |
         CDK_CONTEXT_ARGS=$(_internals/shell-functions/context-args-from.sh \
-          ${{ inputs.context }})
+          "$CONTEXT_FILES"
         echo "::set-output name=cdk_context_args::$CDK_CONTEXT_ARGS"
 
     - name: Synth environment
@@ -78,10 +83,12 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
+        AWS_ACCOUNT_ID: ${{ secrets.awsAccountId }}
+        AWS_REGION: ${{ secrets.awsRegion }}
+        CDK_CONTEXT_ARGS: ${{ steps.cdk_context.outputs.cdk_context_args }} 
       run: |
         TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
-          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }} \
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" "$CDK_CONTEXT_ARGS"
         )
         echo "::set-output name=template::$(echo "$TEMPLATE" | jq -c)"
 
@@ -89,10 +96,12 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
+        AWS_ACCOUNT_ID: ${{ secrets.awsAccountId }}
+        AWS_REGION: ${{ secrets.awsRegion }}
+        CDK_CONTEXT_ARGS: ${{ steps.cdk_context.outputs.cdk_context_args }} 
       run: |
         _internals/shell-functions/npm-run-cdk.sh 'deploy' \
-          '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }}
+          "$AWS_ACCOUNT_ID" "$AWS_REGION" "$CDK_CONTEXT_ARGS"
 
     - name: Run E2E tests
       env:
