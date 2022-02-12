@@ -82,7 +82,7 @@ jobs:
       context: >-
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
-        <(echo "{\"stackName\":\"${{ inputs.stackName }}\"}")
+        <(echo "{\"stackName\":\"StaticSite-Integration-${{ github.sha }}\"}")
         <(echo "{\"subdomain\":\"${{ github.sha }}\"}")
       # site domain is made accessible to caller with ${SITE_E2E_TARGET_DOMAIN}
       testScript: |
