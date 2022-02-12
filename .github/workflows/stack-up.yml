@@ -79,10 +79,10 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.awsAccessKeyId }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.awsSecretAccessKey }}
       run: |
-        TEMPLATE=$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
+        TEMPLATE="$(_internals/shell-functions/npm-run-cdk.sh 'synth' \
           '${{ secrets.awsAccountId }}' '${{ secrets.awsRegion }}' \
-          ${{ steps.cdk_context.outputs.cdk_context_args }} \
-        )
+          ${{ steps.cdk_context.outputs.cdk_context_args }}
+        )"
         echo "::set-output name=template::$TEMPLATE"
 
     - name: Deploy environment
