@@ -6,7 +6,7 @@ on:
 
   push:
     branches: [master]
-    
+
   workflow_dispatch:
     inputs:
       version:
@@ -104,7 +104,7 @@ jobs:
       awsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
       awsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}          
-    
+
   release:
     needs: [setup, build, integration]
     if: >-
