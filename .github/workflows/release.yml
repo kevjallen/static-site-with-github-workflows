@@ -42,8 +42,8 @@ jobs:
       !needs.setup.outputs.version
     runs-on: ubuntu-latest
     outputs:
-      artifactName: ${{ steps.defaults.outputs.artifact_name }}
-      artifactDirName: ${{ steps.defaults.outputs.artifact_dirname }}
+      artifactName: ${{ steps.artifact.outputs.artifact_name }}
+      publishFolder: ${{ steps.artifact.outputs.publish_folder }}
 
     steps:
     - name: Checkout
@@ -53,21 +53,17 @@ jobs:
       uses: ruby/setup-ruby@v1
 
     - name: Create artifact
+      id: artifact
       run: |
-        _internals/shell-functions/create-artifact.sh
-
-    - name: Get artifact defaults
-      id: defaults
-      run: |
-        source _internals/defaults.sh
+        source _internals/shell-functions/create-artifact.sh
         echo "::set-output name=artifact_name::$(basename "$ARTIFACT_PATH" .zip)"
-        echo "::set-output name=artifact_dirname::$(dirname "$ARTIFACT_PATH")"
+        echo "::set-output name=publish_folder::$(dirname "$ARTIFACT_PATH")"
 
-    - name: Upload release candidate
+    - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ steps.defaults.outputs.artifact_name }}
-        path: ${{ steps.defaults.outputs.artifact_dirname }}
+        name: ${{ steps.artifact.outputs.artifact_name }}
+        path: ${{ steps.artifact.outputs.publish_folder }}
 
   integration:
     needs: [setup, build]
@@ -128,7 +124,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: ${{ needs.build.outputs.artifactName }}
-        path: ${{ needs.build.outputs.artifactDirName }}
+        path: ${{ needs.build.outputs.publishFolder }}
 
     - name: Create official release
       id: release
