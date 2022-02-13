@@ -151,12 +151,7 @@ jobs:
         needs.setup.outputs.version ||
         needs.release.outputs.version
       )
-    uses: >- 
-      ./.github/workflows/stack-up.yml@${{ 
-        github.event.inputs.version ||
-        needs.setup.outputs.version ||
-        needs.release.outputs.version 
-      }}
+    uses: ./.github/workflows/stack-up.yml
     with:
       version: >-
         ${{
@@ -182,12 +177,7 @@ jobs:
         needs.setup.outputs.version ||
         needs.release.outputs.version
       )
-    uses: >- 
-      ./.github/workflows/stack-up.yml@${{ 
-        github.event.inputs.version ||
-        needs.setup.outputs.version ||
-        needs.release.outputs.version 
-      }}
+    uses: ./.github/workflows/stack-up.yml
     with:
       version: >-
         ${{
