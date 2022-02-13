@@ -2,6 +2,12 @@
 
 This repository demonstrates CI/CD for a static website
 
+## Notable dependencies
+
+- **Jekyll**: Static site generator
+- **GitHub actions**: Automation platform
+- **AWS CDK (TypeScript)**: Infrastructure as code
+
 ## Using this repository
 
 ### Environments
@@ -24,12 +30,9 @@ These secrets may be set within individual environments or at the repository lev
 ### Release workflow
 
 The behavior of this workflow depends on the event that triggered it:
-- **Pull request event**: 
-  - Runs only the build and integration jobs
-- **Push event**: 
-  - Runs the full workflow (build, integration, release, deployment)
-- **Manual start (with version)**: 
-  - Runs only the deployment jobs with specified version
+- **Pull request event**: Runs the build and integration jobs
+- **Push event**: Runs the full workflow (build, integration, release, deployment)
+- **Manual start (with version)**: Runs only the deployment jobs
 - **Manual start (without version)**:
-  - Runs the full workflow if a version is not detected for the commit being ran on
-    - Otherwise, runs only the deployment jobs with detected version
+  - If the HEAD has a version, runs only the deployment jobs with that version
+  - If the HEAD does not have a version, runs the full workflow
