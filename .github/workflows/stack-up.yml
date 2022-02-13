@@ -36,13 +36,13 @@ jobs:
     - name: Setup asdf
       uses: asdf-vm/actions/setup@v1
 
-    - name: Install nodejs
-      run: |
-        asdf plugin add nodejs && asdf install nodejs
-
     - name: Install jq
       run: |
         asdf plugin add jq && asdf install jq
+
+    - name: Install nodejs
+      run: |
+        asdf plugin add nodejs && asdf install nodejs
 
     - name: Get artifact defaults
       id: defaults
