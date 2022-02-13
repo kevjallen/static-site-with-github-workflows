@@ -19,7 +19,7 @@ jobs:
       !github.event.pull_request
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version_lookup.outputs.version }}
+      version: ${{ steps.current_version_lookup.outputs.version }}
 
     steps:
     - name: Checkout
@@ -27,8 +27,8 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Lookup current version
-      id: version_lookup
+    - name: Look for current version
+      id: current_version_lookup
       run: |
         VERSION=$(git tag --points-at)
         echo "::set-output name=version::$VERSION"
@@ -65,8 +65,16 @@ jobs:
         name: ${{ steps.artifact.outputs.artifact_name }}
         path: ${{ steps.artifact.outputs.publish_folder }}
 
+  inspect_stack:
+    needs: [setup]
+    if: >-
+      !failure() &&
+      !github.event.inputs.version &&
+      !needs.setup.outputs.version
+    uses: ./.github/workflows/stack-inspect.yml
+
   integration:
-    needs: [setup, build]
+    needs: [setup, build, inspect_stack]
     if: >-
       !failure() &&
       !github.event.inputs.version &&
@@ -87,7 +95,7 @@ jobs:
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}   
 
   post_integration:
-    needs: [setup, build, integration]
+    needs: [setup, build, inspect_stack, integration]
     if: >-
       always()
     uses: ./.github/workflows/stack-down.yml
@@ -106,7 +114,7 @@ jobs:
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}          
 
   release:
-    needs: [setup, build, integration]
+    needs: [setup, build, inspect_stack, integration]
     if: >-
       !failure() &&
       !github.event.inputs.version &&
@@ -136,7 +144,7 @@ jobs:
         echo "::set-output name=version::$VERSION"
 
   preview:
-    needs: [setup, build, integration, release]
+    needs: [setup, build, inspect_stack, integration, release]
     if: >-
       !failure() && (
         github.event.inputs.version ||
@@ -162,7 +170,7 @@ jobs:
       awsRegion: ${{ secrets.AWS_DEFAULT_REGION }}
 
   production:
-    needs: [setup, build, integration, release, preview]
+    needs: [setup, build, inspect_stack, integration, release, preview]
     if: >-
       !failure() && (
         github.event.inputs.version ||
