@@ -1,6 +1,7 @@
 module.exports = {
   env: {
     es2021: true,
+    'jest/globals': true,
   },
   extends: [
     'airbnb-base',
@@ -16,6 +17,7 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'cdk',
+    'jest',
   ],
   rules: {
     'no-new': 'off',
