@@ -1,6 +1,6 @@
 # Static website demo
 
-This repository demonstrates CI/CD for a static website
+This repository demonstrates CI/CD for a static website.
 
 ## Notable dependencies
 
@@ -9,6 +9,13 @@ This repository demonstrates CI/CD for a static website
 - **AWS CDK (TypeScript)**: Infrastructure as code
 
 ## Using this repository
+
+### Bootstrapping AWS
+
+The target AWS account/region pair must be bootstrapped for use with the CDK.
+
+The `cdk bootstrap` command will grant admin rights to CloudFormation by default.
+- Use the `--cloudformation-execution-policies` flag to assign lesser permissions.
 
 ### Environments
 
@@ -20,12 +27,12 @@ Three "environments" are included:
 ### Secrets
 
 Some secrets must be added to the repository for the workflows to function:
-- `AWS_ACCESS_KEY_ID`: identifier of the IAM user key to perform deployments with
-- `AWS_SECRET_ACCESS_KEY`: the IAM user key to perform deployments with
+- `AWS_ACCESS_KEY_ID`: ID of the IAM user key to start deployments with
+- `AWS_SECRET_ACCESS_KEY`: the IAM user key to start deployments with
 - `AWS_ACCOUNT_ID`: identifier of the AWS account being deployed to
 - `AWS_DEFAULT_REGION`: name of the AWS region being deployed to
 
-These secrets may be set within individual environments or at the repository level
+These secrets may be set within individual environments or at the repository level.
 
 ### Release workflow
 
