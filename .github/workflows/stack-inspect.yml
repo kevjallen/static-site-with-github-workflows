@@ -17,9 +17,20 @@ jobs:
         source _internals/defaults.sh
         echo "::set-output name=stack_path::$AWS_STACK_PATH"
 
-    - name: Run linter
+    - name: Install CDK application dependencies
       env:
         AWS_STACK_PATH: ${{ steps.defaults.outputs.stack_path }}
       run: |
-        cd "$AWS_STACK_PATH"
-        npm install && npm run lint
+        cd "$AWS_STACK_PATH" && npm install
+
+    - name: Lint CDK application
+      env:
+        AWS_STACK_PATH: ${{ steps.defaults.outputs.stack_path }}
+      run: |
+        cd "$AWS_STACK_PATH" && npm run lint
+
+    - name: Test CDK application
+      env:
+        AWS_STACK_PATH: ${{ steps.defaults.outputs.stack_path }}
+      run: |
+        cd "$AWS_STACK_PATH" && npm run test
