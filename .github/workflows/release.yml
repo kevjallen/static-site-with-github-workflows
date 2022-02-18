@@ -86,7 +86,7 @@ jobs:
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
       cdkArguments: >-
-        -c stackName=StaticSite-Integration-${{ github.sha }}
+        -c stackName=staticsite-integration-${{ github.sha }}
         -c subdomain=${{ github.sha }}
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -105,7 +105,7 @@ jobs:
         _internals/site-contexts/_common.json
         _internals/site-contexts/env-integration.json
       cdkArguments: >-
-        -c stackName=StaticSite-Integration-${{ github.sha }}
+        -c stackName=staticsite-integration-${{ github.sha }}
         -c subdomain=${{ github.sha }}
     secrets:
       awsAccountId: ${{ secrets.AWS_ACCOUNT_ID }}

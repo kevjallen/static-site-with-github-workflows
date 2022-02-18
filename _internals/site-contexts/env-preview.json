@@ -1,5 +1,5 @@
 {
-  "stackName": "StaticSite-Preview-000",
+  "stackName": "staticsite-preview-000",
   "subdomain": "preview.site",
   "responseBehaviors": {
     "customHeaders": [

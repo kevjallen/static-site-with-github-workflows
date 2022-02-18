@@ -1,0 +1,7 @@
+{
+  "stackName": "staticsite-common-000",
+  "sourceConnectionId": "bad4ffec-6d29-4b6a-bf2a-c4718648d78e",
+  "sourceBranch": "cdk-pipelines",
+  "sourceRepo": "kevjallen/static-site",
+  "synthOutputDir": "_internals/aws-stack/cdk.out"
+}

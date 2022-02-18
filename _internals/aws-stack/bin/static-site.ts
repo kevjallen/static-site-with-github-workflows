@@ -6,8 +6,8 @@ import { StaticSiteStack } from '../lib/static-site-stack';
 const app = new cdk.App();
 
 new StaticSiteStack(app, app.node.tryGetContext('stackName'), {
-  domainName: app.node.tryGetContext('domainName'),
   certificateArn: app.node.tryGetContext('certificateArn'),
+  domainName: app.node.tryGetContext('domainName'),
   forceDestroy: app.node.tryGetContext('forceDestroy'),
   hostedZoneId: app.node.tryGetContext('hostedZoneId'),
   siteContentsPath: app.node.tryGetContext('siteContentsPath'),
