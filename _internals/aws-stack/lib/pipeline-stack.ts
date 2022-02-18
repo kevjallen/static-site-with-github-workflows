@@ -21,10 +21,10 @@ export class PipelineStack extends Stack {
     const sourceBranch = props.sourceBranch || 'master';
 
     const systemSetupCommands = !props.synthAptDeps ? [] : [
-      `apt-get update && apt-get install ${props.synthAptDeps.join(' ')}`
+      `apt-get update && apt-get install -y ${props.synthAptDeps.join(' ')}`
     ];
     const toolSetupCommands = [
-      'apt-get update && apt-get install git curl',
+      'apt-get update && apt-get install -y git curl',
       'git clone $ASDF_REPO $HOME/.asdf --branch $ASDF_VERSION',
       'source $HOME/.asdf/asdf.sh && asdf install'
     ];
