@@ -4,7 +4,6 @@ import { PipelineStack } from '../lib/pipeline-stack';
 import { StaticSiteAppStage } from '../lib/static-site-app-stage';
 
 const app = new cdk.App();
-
 const cdkAppPath = '_internals/aws-stack';
 
 const sourceConnectionId = app.node.tryGetContext('sourceConnectionId');
@@ -30,14 +29,20 @@ new PipelineStack(app, 'StaticSitePipeline', {
       siteContentsPath: '../../_site',
       subdomain: 'preview.site',
     }),
+    new StaticSiteAppStage(app, 'StaticSite-Production-000', {
+      domainName: 'kevjallen.com',
+      hostedZoneId: 'Z102223439S3NOHHBSICY',
+      siteContentsPath: '../../_site',
+      subdomain: 'site',
+    }),
   ],
   buildImage: 'ubuntu-build:v1.1.2',
   installCommands: [
     '. $ASDF_SCRIPT && asdf install',
   ],
   pipelineName: 'static-site',
+  sourceBranch: 'master',
   synthCommandShell: 'bash',
-  sourceBranch: 'cdk-pipelines',
   synthEnv: {
     ASDF_SCRIPT: '/root/.asdf/asdf.sh',
   },
