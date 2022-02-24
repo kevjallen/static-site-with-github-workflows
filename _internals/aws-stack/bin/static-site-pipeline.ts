@@ -4,7 +4,8 @@ import { PipelineStack } from '../lib/pipeline-stack';
 import { StaticSiteAppStage } from '../lib/static-site-app-stage';
 
 const app = new cdk.App();
-const cdkAppPath = process.cwd();
+
+const cdkAppPath = '_internals/aws-stack';
 
 const sourceConnectionId = app.node.tryGetContext('sourceConnectionId');
 
@@ -35,7 +36,7 @@ new PipelineStack(app, 'StaticSitePipeline', {
   synthCommandShell: 'bash',
   sourceBranch: 'cdk-pipelines',
   synthEnv: {
-    ASDF_SCRIPT: '/root/.asdf/asdf.sh'
+    ASDF_SCRIPT: '/root/.asdf/asdf.sh',
   },
   synthOutputDir: `${cdkAppPath}/cdk.out`,
 });
