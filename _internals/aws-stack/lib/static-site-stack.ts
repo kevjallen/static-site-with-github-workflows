@@ -33,29 +33,29 @@ export type StaticSiteStackProps = StaticSiteStackBaseProps & (
 );
 
 export class StaticSiteStack extends Stack {
-  constructor(scope: Construct, id: string, props: StaticSiteStackProps) {
+  constructor(scope: Construct, id: string, props?: StaticSiteStackProps) {
     super(scope, id, props);
 
-    const siteDomain = [props.subdomain, props.domainName].join('.');
+    const siteDomain = [props?.subdomain, props?.domainName].join('.');
 
-    if (props.domainName) {
+    if (props?.domainName) {
       new CfnOutput(this, 'SiteDomain', { value: siteDomain });
     }
 
     let zone: route53.IHostedZone | undefined;
-    if (props.hostedZoneId) {
+    if (props?.hostedZoneId) {
       zone = route53.HostedZone.fromHostedZoneAttributes(this, 'Zone', {
-        hostedZoneId: props.hostedZoneId,
-        zoneName: props.domainName,
+        hostedZoneId: props?.hostedZoneId,
+        zoneName: props?.domainName,
       });
     }
 
     let certificate : acm.ICertificate | undefined;
-    if (props.certificateArn) {
+    if (props?.certificateArn) {
       certificate = acm.Certificate.fromCertificateArn(
         this,
         'SiteCertificate',
-        props.certificateArn,
+        props?.certificateArn,
       );
     }
 
@@ -71,9 +71,9 @@ export class StaticSiteStack extends Stack {
     const oaiS3CanonicalUserId = oai.cloudFrontOriginAccessIdentityS3CanonicalUserId;
 
     const bucket = new s3.Bucket(this, 'SiteBucket', {
-      autoDeleteObjects: props.forceDestroy,
+      autoDeleteObjects: props?.forceDestroy,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      removalPolicy: props.forceDestroy ? RemovalPolicy.DESTROY : undefined,
+      removalPolicy: props?.forceDestroy ? RemovalPolicy.DESTROY : undefined,
     });
     bucket.addToResourcePolicy(new iam.PolicyStatement({
       actions: ['s3:GetObject'],
@@ -83,12 +83,12 @@ export class StaticSiteStack extends Stack {
     new CfnOutput(this, 'BucketName', { value: bucket.bucketName });
 
     let headers: cloudfront.IResponseHeadersPolicy | undefined;
-    if (props.responseBehaviors) {
+    if (props?.responseBehaviors) {
       headers = new cloudfront.ResponseHeadersPolicy(this, 'SiteHeaders', {
         customHeadersBehavior: {
-          customHeaders: props.responseBehaviors?.customHeaders || [],
+          customHeaders: props?.responseBehaviors?.customHeaders || [],
         },
-        securityHeadersBehavior: props.responseBehaviors?.securityHeaders,
+        securityHeadersBehavior: props?.responseBehaviors?.securityHeaders,
       });
     }
 
@@ -113,12 +113,12 @@ export class StaticSiteStack extends Stack {
       });
     }
 
-    if (props.siteContentsPath) {
+    if (props?.siteContentsPath) {
       new deploy.BucketDeployment(this, 'SiteDeployment', {
         destinationBucket: bucket,
         distribution,
         distributionPaths: ['/*'],
-        sources: [deploy.Source.asset(props.siteContentsPath)],
+        sources: [deploy.Source.asset(props?.siteContentsPath)],
       });
     }
   }

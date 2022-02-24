@@ -2,11 +2,11 @@
   "name": "static-site",
   "version": "0.1.0",
   "bin": {
-    "static-site": "bin/static-site.js"
+    "static-site-pipeline": "bin/static-site-pipeline.js"
   },
   "scripts": {
     "build": "tsc",
-    "lint": "eslint bin/**/*.ts lib/**/*.ts test/**/*.ts",
+    "lint": "eslint ./**/*.ts",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk"
