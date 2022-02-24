@@ -27,9 +27,9 @@ new PipelineStack(app, 'StaticSitePipeline', {
       siteContentsPath: '../../_site',
     }),
   ],
-  buildImage: 'ubuntu-build:v1.0.0',
+  buildImage: 'ubuntu-build:v1.1.2',
   installCommands: [
-    'source $ASDF_SCRIPT && asdf install',
+    '. $ASDF_SCRIPT && asdf install',
   ],
   pipelineName: 'static-site',
   synthCommandShell: 'bash',
