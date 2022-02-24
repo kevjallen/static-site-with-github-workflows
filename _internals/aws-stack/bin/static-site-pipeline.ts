@@ -25,7 +25,10 @@ new PipelineStack(app, 'StaticSitePipeline', {
   ],
   appStages: [
     new StaticSiteAppStage(app, 'StaticSite-Preview-000', {
+      domainName: 'kevjallen.com',
+      hostedZoneId: 'Z102223439S3NOHHBSICY',
       siteContentsPath: '../../_site',
+      subdomain: 'preview.site',
     }),
   ],
   buildImage: 'ubuntu-build:v1.1.2',
